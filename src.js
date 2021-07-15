@@ -15,17 +15,29 @@
 
 		for(const e of elevators){
 			e.on("idle", () => {
-				const dest = inDemands.shift();
-				if (dest != null){
+				const handleRequest = () => {
+					const dest = inDemands.shift();
+					if (dest == null)
+						return;
+
 					console.log(`idle, picking up from floor ${dest.from}`)
 					e.goToFloor(dest.from);
-				}else{
-					const out = outDemands.shift();
-					if(out != null){
-						console.log(`idle, moving passenger to floor ${out.to}`)
-						e.goToFloor(out.to);
-					}
+					return true;
 				}
+				const handleDropoff = () => {
+					const out = outDemands.shift();
+					if(out == null)
+						return;
+
+					console.log(`idle, moving passenger to floor ${out.to}`)
+					e.goToFloor(out.to);
+					return true;
+				}
+
+				if (handleRequest())
+					return;
+				if (handleDropoff())
+					return;
 			});
 			e.on("stopped_at_floor", floorNum => {
 				console.log(`stopped at floor ${floorNum}`);
