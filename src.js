@@ -16,6 +16,9 @@
 		for(const e of elevators){
 			e.on("idle", () => {
 				const handleRequest = () => {
+					if (outDemands.length > 0 && e.loadFactor() > 0.5)
+						return;
+
 					const dest = inDemands.shift();
 					if (dest == null)
 						return;
